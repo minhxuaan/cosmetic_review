@@ -1,0 +1,99 @@
+<?php include 'admin_header.php';
+
+$error = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name        = sanitize($_POST['name'] ?? '');
+    $brand       = sanitize($_POST['brand'] ?? '');
+    $category_id = (int)($_POST['category_id'] ?? 0);
+    $description = sanitize($_POST['description'] ?? '');
+    $price       = (float)($_POST['price'] ?? 0);
+
+    if (empty($name) || empty($brand)) {
+        $error = 'Vui lòng điền đầy đủ tên và thương hiệu.';
+    } else {
+        $image = '';
+        if (!empty($_FILES['image']['name'])) {
+            $upload_dir = '../uploads/products/';
+            if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
+            $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+            $allowed = ['jpg','jpeg','png','webp'];
+            if (in_array(strtolower($ext), $allowed) && $_FILES['image']['size'] < 5*1024*1024) {
+                $image = uniqid('prod_') . '.' . $ext;
+                move_uploaded_file($_FILES['image']['tmp_name'], $upload_dir . $image);
+            }
+        }
+
+        $stmt = $conn->prepare("INSERT INTO products (name, brand, category_id, description, price, image) VALUES (?,?,?,?,?,?)");
+        $stmt->bind_param('ssisds', $name, $brand, $category_id, $description, $price, $image);
+        if ($stmt->execute()) {
+            redirect('products.php?msg=added');
+        } else {
+            $error = 'Lỗi khi thêm sản phẩm.';
+        }
+    }
+}
+
+$categories = $conn->query("SELECT * FROM categories ORDER BY name");
+?>
+
+<div class="admin-topbar">
+    <h1>Thêm sản phẩm mới</h1>
+    <a href="products.php" style="font-size:0.9rem;color:var(--rose);"><i class="fas fa-arrow-left"></i> Quay lại</a>
+</div>
+
+<?php if ($error): ?>
+    <div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <?= $error ?></div>
+<?php endif; ?>
+
+<div class="admin-card">
+    <div class="admin-card-header"><h3>Thông tin sản phẩm</h3></div>
+    <div style="padding:32px;">
+        <form method="POST" enctype="multipart/form-data">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                <div class="form-group">
+                    <label>Tên sản phẩm *</label>
+                    <input type="text" name="name" value="<?= htmlspecialchars($_POST['name']??'') ?>" required>
+                </div>
+                <div class="form-group">
+                    <label>Thương hiệu *</label>
+                    <input type="text" name="brand" value="<?= htmlspecialchars($_POST['brand']??'') ?>" required>
+                </div>
+                <div class="form-group">
+                    <label>Danh mục</label>
+                    <select name="category_id">
+                        <option value="">-- Chọn danh mục --</option>
+                        <?php while ($c = $categories->fetch_assoc()): ?>
+                            <option value="<?= $c['id'] ?>" <?= ($_POST['category_id']??'')==$c['id']?'selected':'' ?>>
+                                <?= htmlspecialchars($c['name']) ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Giá (VNĐ)</label>
+                    <input type="number" name="price" value="<?= htmlspecialchars($_POST['price']??'') ?>" min="0" step="1000">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Mô tả sản phẩm</label>
+                <textarea name="description" rows="5" style="width:100%;padding:12px;border:1.5px solid var(--cream-dark);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;resize:vertical;"><?= htmlspecialchars($_POST['description']??'') ?></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Ảnh sản phẩm</label>
+                <input type="file" name="image" accept="image/*" style="padding:8px;background:var(--cream);">
+                <small style="color:#888;">JPG, PNG, WEBP. Tối đa 5MB.</small>
+            </div>
+
+            <button type="submit" class="btn-add" style="padding:12px 28px;border-radius:50px;border:none;cursor:pointer;font-size:0.95rem;">
+                <i class="fas fa-plus"></i> Thêm sản phẩm
+            </button>
+        </form>
+    </div>
+</div>
+
+</main></div>
+<script src="../assets/js/main.js"></script>
+</body></html>

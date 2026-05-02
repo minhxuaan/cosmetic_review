@@ -1,0 +1,14 @@
+# File kết nối database - chứa mật khẩu, KHÔNG push
+config/db.php
+
+# Thư mục uploads - chứa ảnh người dùng, thường rất nặng
+# Nhưng vẫn giữ thư mục rỗng trên GitHub
+uploads/*
+!uploads/.gitkeep
+
+# Rác hệ thống Windows
+Thumbs.db
+desktop.ini
+
+# Rác macOS
+.DS_Store
