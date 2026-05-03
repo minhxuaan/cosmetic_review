@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <?= $error ?></div>
         <?php endif; ?>
 
-        <div class="alert alert-warning" style="margin-bottom:24px;">
+        <div class="alert alert-warning alert-permanent" style="margin-bottom:24px;">
             <i class="fas fa-clock"></i>
             Bài review sẽ được <strong>admin duyệt</strong> trước khi hiển thị công khai. Thường trong vòng 24 giờ.
         </div>

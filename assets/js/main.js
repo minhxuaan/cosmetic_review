@@ -33,7 +33,7 @@ document.querySelectorAll('.review-images img').forEach(img => {
 });
 
 // Auto hide alerts
-document.querySelectorAll('.alert').forEach(alert => {
+document.querySelectorAll('.alert:not(.alert-permanent)').forEach(alert => {
     setTimeout(() => {
         alert.style.transition = 'opacity 0.5s';
         alert.style.opacity = '0';

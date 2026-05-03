@@ -123,7 +123,7 @@ $counts = [
                     </div>
 
                     <?php if ($p['status'] === 'rejected' && $p['reject_reason']): ?>
-                        <div class="alert alert-error" style="margin-top:8px;padding:8px 12px;font-size:0.83rem;">
+                        <div class="alert alert-error alert-permanent" style="margin-top:8px;padding:8px 12px;font-size:0.83rem;">
                             <i class="fas fa-info-circle"></i>
                             Lý do từ chối: <?= htmlspecialchars($p['reject_reason']) ?>
                         </div>
