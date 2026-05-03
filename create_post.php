@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $cat_val = $category_id ?: 'NULL';
         $stmt = $conn->prepare("INSERT INTO posts (user_id, product_name, brand, category_id, rating, title, content, pros, cons, cover_image, status) VALUES (?,?,?,?,?,?,?,?,?,?,'pending')");
-        $stmt->bind_param('issiiissss', $uid, $product_name, $brand, $category_id, $rating, $title, $content, $pros, $cons, $cover_image);
+        $stmt->bind_param('issiisssss', $uid, $product_name, $brand, $category_id, $rating, $title, $content, $pros, $cons, $cover_image);
 
         if ($stmt->execute()) {
             $post_id = $conn->insert_id;

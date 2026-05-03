@@ -18,8 +18,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reject_id'])) {
 // Delete
 if (isset($_GET['delete'])) {
     $p_id = (int)$_GET['delete'];
+    $current_filter = $_GET['filter'] ?? 'pending';
     $conn->query("DELETE FROM posts WHERE id=$p_id");
-    redirect('posts_manage.php?msg=deleted');
+    redirect('posts_manage.php?msg=deleted&filter=' . $current_filter);
 }
 
 $msg = $_GET['msg'] ?? '';

@@ -4,8 +4,11 @@ require_once 'config/db.php';
 $id = (int)($_GET['id'] ?? 0);
 if (!$id) redirect('posts.php');
 
-// Admin có thể xem tất cả trạng thái, user chỉ xem approved
-$status_condition = isAdmin() ? "1=1" : "p.status = 'approved'";
+// Admin có thể xem tất cả trạng thái, user chỉ xem bài của chính mình dù chưa được duyệt
+$uid_preview = $_SESSION['user_id'] ?? 0;
+$status_condition = isAdmin() 
+    ? "1=1" 
+    : "(p.status = 'approved' OR (p.user_id = $uid_preview AND " . (isset($_GET['preview']) ? "1=1" : "0=1") . "))";
 
 $post = $conn->query("
     SELECT p.*, u.username, u.avatar, c.name as category_name
@@ -70,7 +73,7 @@ $related = $conn->query("
 
     <!-- Banner trạng thái cho Admin -->
     <?php if (isAdmin() && $post['status'] !== 'approved'): ?>
-    <div class="alert <?= $post['status']==='pending' ? 'alert-warning' : 'alert-error' ?>" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+    <div class="alert <?= $post['status']==='pending' ? 'alert-warning' : 'alert-error' ?> alert-permanent" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
         <div>
             <?php if ($post['status'] === 'pending'): ?>
                 <i class="fas fa-hourglass-half"></i>

@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             SET product_name=?, brand=?, category_id=?, rating=?, title=?, content=?, pros=?, cons=?, cover_image=?, status=?
             WHERE id=?
         ");
-        $stmt->bind_param('ssiisssssi', $product_name, $brand, $category_id, $rating, $title, $content, $pros, $cons, $cover_image, $new_status, $id);
+        $stmt->bind_param('ssiissssssi', $product_name, $brand, $category_id, $rating, $title, $content, $pros, $cons, $cover_image, $new_status, $id);
 
         if ($stmt->execute()) {
             // Upload ảnh gallery mới nếu có
@@ -136,7 +136,7 @@ $gallery = $conn->query("SELECT * FROM post_images WHERE post_id = $id");
             <i class="fas fa-arrow-left"></i> Bài review của tôi
         </a>
         <?php if ($post['status'] !== 'approved' || isAdmin()): ?>
-            <a href="post_detail.php?id=<?= $id ?>" target="_blank" style="color:var(--charcoal-mid);font-size:0.9rem;">
+            <a href="post_detail.php?id=<?= $id ?>&preview=1" target="_blank" style="color:var(--charcoal-mid);font-size:0.9rem;">
                 <i class="fas fa-eye"></i> Xem trước
             </a>
         <?php endif; ?>
@@ -144,13 +144,13 @@ $gallery = $conn->query("SELECT * FROM post_images WHERE post_id = $id");
 
     <!-- Thông báo trạng thái -->
     <?php if ($post['status'] === 'rejected' && !isAdmin()): ?>
-        <div class="alert alert-error" style="margin-bottom:16px;">
+        <div class="alert alert-error alert-permanent" style="margin-bottom:16px;">
             <i class="fas fa-info-circle"></i>
             Bài bị từ chối<?php if ($post['reject_reason']): ?>: <strong><?= htmlspecialchars($post['reject_reason']) ?></strong><?php endif; ?>.
             Hãy chỉnh sửa và gửi lại để được duyệt.
         </div>
     <?php elseif ($post['status'] === 'pending'): ?>
-        <div class="alert alert-warning" style="margin-bottom:16px;">
+        <div class="alert alert-warning alert-permanent" style="margin-bottom:16px;">
             <i class="fas fa-hourglass-half"></i>
             Bài đang chờ duyệt. Bạn vẫn có thể chỉnh sửa trước khi admin duyệt.
         </div>
@@ -345,10 +345,32 @@ $gallery = $conn->query("SELECT * FROM post_images WHERE post_id = $id");
 </style>
 
 <script>
-const ratingLabels = ['','Rất tệ 😞','Không tốt 😕','Bình thường 😐','Tốt 😊','Xuất sắc! 🌟'];
-document.querySelectorAll('.star-rating-input input').forEach(input => {
+const stars = document.querySelectorAll('.star-rating-input label');
+const inputs = document.querySelectorAll('.star-rating-input input');
+const labels = ['', 'Rất tệ 😞', 'Không tốt 😕', 'Bình thường 😐', 'Tốt 😊', 'Tuyệt vời! 🌟'];
+
+function updateStars(value) {
+    stars.forEach(label => {
+        const starVal = parseInt(label.getAttribute('for').replace('star', ''));
+        label.style.color = starVal <= value ? 'var(--gold, #f4a621)' : '#ddd';
+    });
+}
+
+inputs.forEach(input => {
     input.addEventListener('change', function() {
-        document.getElementById('ratingLabel').textContent = ratingLabels[this.value];
+        updateStars(parseInt(this.value));
+        document.getElementById('ratingLabel').textContent = labels[this.value];
+    });
+});
+
+stars.forEach(label => {
+    label.addEventListener('mouseenter', function() {
+        const val = parseInt(this.getAttribute('for').replace('star', ''));
+        updateStars(val);
+    });
+    label.addEventListener('mouseleave', function() {
+        const checked = document.querySelector('.star-rating-input input:checked');
+        updateStars(checked ? parseInt(checked.value) : 0);
     });
 });
 
