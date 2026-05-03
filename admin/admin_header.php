@@ -33,11 +33,19 @@ $current_admin = basename($_SERVER['PHP_SELF']);
             <i class="fas fa-box"></i> Sản phẩm
         </a>
         <a href="reviews.php" class="<?= $current_admin==='reviews.php'?'active':'' ?>">
-            <i class="fas fa-star"></i> Review
+            <i class="fas fa-star"></i> Review sản phẩm
             <?php
             $pending = $conn->query("SELECT COUNT(*) as c FROM reviews WHERE status='pending'")->fetch_assoc()['c'];
             if ($pending > 0): ?>
                 <span style="background:var(--rose);color:white;border-radius:50px;padding:1px 7px;font-size:0.72rem;margin-left:auto;"><?= $pending ?></span>
+            <?php endif; ?>
+        </a>
+        <a href="posts_manage.php" class="<?= $current_admin==='posts_manage.php'?'active':'' ?>">
+            <i class="fas fa-newspaper"></i> Bài post user
+            <?php
+            $pending_posts = $conn->query("SELECT COUNT(*) as c FROM posts WHERE status='pending'")->fetch_assoc()['c'];
+            if ($pending_posts > 0): ?>
+                <span style="background:var(--gold);color:white;border-radius:50px;padding:1px 7px;font-size:0.72rem;margin-left:auto;"><?= $pending_posts ?></span>
             <?php endif; ?>
         </a>
         <a href="users.php" class="<?= $current_admin==='users.php'?'active':'' ?>">

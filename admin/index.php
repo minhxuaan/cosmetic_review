@@ -7,6 +7,8 @@ $stats = [
     'users'    => $conn->query("SELECT COUNT(*) as c FROM users WHERE role='user'")->fetch_assoc()['c'],
     'reviews'  => $conn->query("SELECT COUNT(*) as c FROM reviews WHERE status='approved'")->fetch_assoc()['c'],
     'pending'  => $conn->query("SELECT COUNT(*) as c FROM reviews WHERE status='pending'")->fetch_assoc()['c'],
+    'posts'        => $conn->query("SELECT COUNT(*) as c FROM posts WHERE status='approved'")->fetch_assoc()['c'],
+    'posts_pending'=> $conn->query("SELECT COUNT(*) as c FROM posts WHERE status='pending'")->fetch_assoc()['c'],
 ];
 
 // Recent reviews
@@ -51,7 +53,21 @@ $monthly = $conn->query("SELECT DATE_FORMAT(created_at,'%m/%Y') as month, COUNT(
         <div class="stat-card-icon blue"><i class="fas fa-clock"></i></div>
         <div class="stat-card-body">
             <div class="stat-card-number"><?= $stats['pending'] ?></div>
-            <div class="stat-card-label">Chờ duyệt</div>
+            <div class="stat-card-label">Review chờ duyệt</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-icon rose"><i class="fas fa-newspaper"></i></div>
+        <div class="stat-card-body">
+            <div class="stat-card-number"><?= $stats['posts'] ?></div>
+            <div class="stat-card-label">Bài post đã duyệt</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-icon gold"><i class="fas fa-hourglass-half"></i></div>
+        <div class="stat-card-body">
+            <div class="stat-card-number"><?= $stats['posts_pending'] ?></div>
+            <div class="stat-card-label">Bài post chờ duyệt</div>
         </div>
     </div>
 </div>
