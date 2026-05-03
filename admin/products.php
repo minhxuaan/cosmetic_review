@@ -36,7 +36,7 @@ $products = $conn->query("SELECT p.*, c.name as cat_name,
 
 <div class="admin-topbar">
     <h1>Quản lý sản phẩm</h1>
-    <a href="add_product.php" class="btn-add"><i class="fas fa-plus"></i> Thêm sản phẩm</a>
+    <a href="add_products.php" class="btn-add"><i class="fas fa-plus"></i> Thêm sản phẩm</a>
 </div>
 
 <?php if ($msg === 'deleted'): ?>
