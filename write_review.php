@@ -120,10 +120,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <script>
+const stars = document.querySelectorAll('.star-rating-input label');
+const inputs = document.querySelectorAll('.star-rating-input input');
 const labels = ['', 'Rất tệ 😞', 'Không tốt 😕', 'Bình thường 😐', 'Tốt 😊', 'Tuyệt vời! 🌟'];
-document.querySelectorAll('.star-rating-input input').forEach(input => {
+
+function updateStars(value) {
+    stars.forEach(label => {
+        const starVal = parseInt(label.getAttribute('for').replace('star', ''));
+        label.style.color = starVal <= value ? 'var(--gold, #f4a621)' : '#ddd';
+    });
+}
+
+inputs.forEach(input => {
     input.addEventListener('change', function() {
+        updateStars(parseInt(this.value));
         document.getElementById('ratingLabel').textContent = labels[this.value];
+    });
+});
+
+stars.forEach(label => {
+    label.addEventListener('mouseenter', function() {
+        const val = parseInt(this.getAttribute('for').replace('star', ''));
+        updateStars(val);
+    });
+    label.addEventListener('mouseleave', function() {
+        const checked = document.querySelector('.star-rating-input input:checked');
+        updateStars(checked ? parseInt(checked.value) : 0);
     });
 });
 </script>

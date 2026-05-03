@@ -340,10 +340,32 @@ form > div:last-child { padding: 0 40px 32px; }
 
 <script>
 // Star rating labels
-const ratingLabels = ['', 'Rất tệ 😞', 'Không tốt 😕', 'Bình thường 😐', 'Tốt 😊', 'Xuất sắc! 🌟'];
-document.querySelectorAll('.star-rating-input input').forEach(input => {
+const stars = document.querySelectorAll('.star-rating-input label');
+const inputs = document.querySelectorAll('.star-rating-input input');
+const labels = ['', 'Rất tệ 😞', 'Không tốt 😕', 'Bình thường 😐', 'Tốt 😊', 'Tuyệt vời! 🌟'];
+
+function updateStars(value) {
+    stars.forEach(label => {
+        const starVal = parseInt(label.getAttribute('for').replace('star', ''));
+        label.style.color = starVal <= value ? 'var(--gold, #f4a621)' : '#ddd';
+    });
+}
+
+inputs.forEach(input => {
     input.addEventListener('change', function() {
-        document.getElementById('ratingLabel').textContent = ratingLabels[this.value];
+        updateStars(parseInt(this.value));
+        document.getElementById('ratingLabel').textContent = labels[this.value];
+    });
+});
+
+stars.forEach(label => {
+    label.addEventListener('mouseenter', function() {
+        const val = parseInt(this.getAttribute('for').replace('star', ''));
+        updateStars(val);
+    });
+    label.addEventListener('mouseleave', function() {
+        const checked = document.querySelector('.star-rating-input input:checked');
+        updateStars(checked ? parseInt(checked.value) : 0);
     });
 });
 
