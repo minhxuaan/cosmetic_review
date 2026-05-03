@@ -53,11 +53,18 @@ $counts = [
     <?php if ($msg === 'deleted'): ?>
         <div class="alert alert-success"><i class="fas fa-check"></i> Đã xóa bài viết.</div>
     <?php endif; ?>
+    <?php if ($msg === 'updated'): ?>
+        <div class="alert alert-success"><i class="fas fa-check-circle"></i> Đã lưu thay đổi thành công!</div>
+    <?php endif; ?>
     <?php if ($msg === 'created'): ?>
         <div class="alert alert-success">
             <i class="fas fa-check-circle"></i>
             Bài review đã được gửi! Chúng tôi sẽ duyệt trong vòng 24 giờ.
         </div>
+    <?php endif; ?>
+    <?php if (!empty($_SESSION['flash'])): ?>
+        <div class="alert alert-warning"><i class="fas fa-info-circle"></i> <?= htmlspecialchars($_SESSION['flash']) ?></div>
+        <?php unset($_SESSION['flash']); ?>
     <?php endif; ?>
 
     <!-- Status Tabs -->
@@ -135,9 +142,15 @@ $counts = [
                                     <i class="fas fa-eye"></i> Xem
                                 </a>
                             <?php endif; ?>
-                            <a href="edit_post.php?id=<?= $p['id'] ?>" class="btn-sm edit">
-                                <i class="fas fa-edit"></i> Sửa
-                            </a>
+                            <?php if ($p['status'] !== 'approved' || isAdmin()): ?>
+                                <a href="edit_post.php?id=<?= $p['id'] ?>" class="btn-sm edit">
+                                    <i class="fas fa-edit"></i> Sửa
+                                </a>
+                            <?php else: ?>
+                                <span class="btn-sm" style="opacity:0.4;cursor:not-allowed;" title="Bài đã duyệt, không thể sửa">
+                                    <i class="fas fa-lock"></i> Đã khóa
+                                </span>
+                            <?php endif; ?>
                             <a href="my_posts.php?delete=<?= $p['id'] ?>" class="btn-sm delete"
                                data-confirm="Xóa bài review '<?= htmlspecialchars(addslashes($p['title'])) ?>'?">
                                 <i class="fas fa-trash"></i> Xóa

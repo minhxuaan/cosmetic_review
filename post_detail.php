@@ -4,12 +4,15 @@ require_once 'config/db.php';
 $id = (int)($_GET['id'] ?? 0);
 if (!$id) redirect('posts.php');
 
+// Admin có thể xem tất cả trạng thái, user chỉ xem approved
+$status_condition = isAdmin() ? "1=1" : "p.status = 'approved'";
+
 $post = $conn->query("
     SELECT p.*, u.username, u.avatar, c.name as category_name
     FROM posts p
     JOIN users u ON p.user_id = u.id
     LEFT JOIN categories c ON p.category_id = c.id
-    WHERE p.id = $id AND p.status = 'approved'
+    WHERE p.id = $id AND $status_condition
 ")->fetch_assoc();
 
 if (!$post) {
@@ -65,7 +68,33 @@ $related = $conn->query("
 
 <div style="max-width:900px;margin:40px auto;padding:0 24px;">
 
-    <!-- Breadcrumb -->
+    <!-- Banner trạng thái cho Admin -->
+    <?php if (isAdmin() && $post['status'] !== 'approved'): ?>
+    <div class="alert <?= $post['status']==='pending' ? 'alert-warning' : 'alert-error' ?>" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+        <div>
+            <?php if ($post['status'] === 'pending'): ?>
+                <i class="fas fa-hourglass-half"></i>
+                <strong>Bài đang chờ duyệt.</strong> Xem xong hãy duyệt hoặc từ chối bên dưới.
+            <?php else: ?>
+                <i class="fas fa-times-circle"></i>
+                <strong>Bài đã bị từ chối.</strong>
+                <?php if ($post['reject_reason']): ?> Lý do: <?= htmlspecialchars($post['reject_reason']) ?><?php endif; ?>
+            <?php endif; ?>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <?php if ($post['status'] === 'pending' || $post['status'] === 'rejected'): ?>
+                <a href="../admin/posts_manage.php?approve=<?= $post['id'] ?>&filter=<?= $post['status'] ?>"
+                   class="btn-sm approve" style="text-decoration:none;">
+                    <i class="fas fa-check"></i> Duyệt bài này
+                </a>
+            <?php endif; ?>
+            <a href="../admin/posts_manage.php?filter=<?= $post['status'] ?>"
+               class="btn-sm edit" style="text-decoration:none;">
+                <i class="fas fa-arrow-left"></i> Quay lại danh sách
+            </a>
+        </div>
+    </div>
+    <?php endif; ?>
     <div style="display:flex;align-items:center;gap:8px;font-size:0.85rem;color:#aaa;margin-bottom:24px;">
         <a href="posts.php" style="color:var(--rose);">Bài review</a>
         <span>›</span>
